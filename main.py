@@ -3,7 +3,7 @@ from jinja2 import Template
 import requests
 import random
 
-GOOGLE_HREF = "https://www.googleapis.com/books/v1/volumes?q=search+terms"
+GOOGLE_HREF = "https://www.googleapis.com/books/v1/volumes"
 
 app = FastAPI()
 
@@ -17,10 +17,15 @@ async def root():
 @app.post("/submit-form/")
 async def submit_form(
     name: str = Form(...),
-    age: int = Form(...),
-    email: str = Form(...)
 ):
-    return {"name": name, "age": age, "email": email}
+    params = {
+        "q": name, 
+        # "maxResults": 1,
+    }
+    
+    response = requests.get(GOOGLE_HREF, params=params)
+
+    return response.json()
 
 @app.get("/search/")
 async def search(
@@ -40,11 +45,10 @@ async def create_file(
         "fileb_content_type": fileb.content_type,
     }
 
-@app.get("/scrape_book/{book_id}")
-async def scrape_book(book_id):
+@app.get("/scrape_book/{book_name}}")
+async def scrape_book(book_name : str):
     params = {
-        "q": "9780321127310"
-        "key", 
+        "q": book_name, # DONT COMMIT TO SOURCE CONTROL
     }
     
     response = requests.get(GOOGLE_HREF, params=params)
